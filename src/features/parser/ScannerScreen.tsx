@@ -37,6 +37,7 @@ export function ScannerScreen() {
   const [datePickerTarget, setDatePickerTarget] = useState<'start' | 'end' | null>(null);
   const [repeatDays, setRepeatDays] = useState([0, 1, 2, 3, 4, 5, 6]);
   const readingController = useRef<AbortController | null>(null);
+  const previewQueueRef = useRef(Promise.resolve());
   const [conflictResult, setConflictResult] = useState<{
     key: string;
     preview: { scheduledCount: number; conflictingCount: number; dateCount: number };
@@ -63,17 +64,21 @@ export function ScannerScreen() {
 
   useEffect(() => {
     if (!result?.items.length || endDate < startDate || repeatDays.length === 0) return;
+
     let isCurrent = true;
-    void previewScheduleConflicts(database, result.items, startDate, endDate, repeatDays)
-      .then((preview) => {
-        if (isCurrent) setConflictResult({ key: conflictQueryKey, preview });
-      })
-      .catch((error: unknown) => {
-        if (isCurrent) {
-          console.error('Could not check imported schedule conflicts.', error);
-          Alert.alert('Could not check for conflicts', 'Your schedule has not been changed. Try again.');
-        }
-      });
+    const queuedPreview = previewQueueRef.current.then(async () => {
+      const preview = await previewScheduleConflicts(database, result.items, startDate, endDate, repeatDays);
+      if (isCurrent) {
+        setConflictResult({ key: conflictQueryKey, preview });
+      }
+    }).catch((error: unknown) => {
+      if (isCurrent) {
+        console.error('Could not check imported schedule conflicts.', error);
+        Alert.alert('Could not check for conflicts', 'Your schedule has not been changed. Try again.');
+      }
+    });
+
+    previewQueueRef.current = queuedPreview;
     return () => {
       isCurrent = false;
     };
