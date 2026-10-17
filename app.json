@@ -2,14 +2,17 @@
   "expo": {
     "name": "FlexiCal",
     "slug": "FlexiCal",
+    "scheme": "flexical",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.flexical.app"
     },
     "android": {
+      "package": "com.flexical.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -20,6 +23,77 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-sharing",
+      [
+        "expo-widgets",
+        {
+          "widgets": [
+            {
+              "name": "FlexiCalNextTask",
+              "displayName": "FlexiCal Next Task",
+              "description": "See your next scheduled task at a glance.",
+              "ios": {
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "FlexiCalNextTask",
+              "label": "FlexiCal Next Task",
+              "description": "See your next scheduled task at a glance.",
+              "minWidth": "180dp",
+              "minHeight": "90dp",
+              "targetCellWidth": 3,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 1800000
+            }
+          ]
+        }
+      ],
+      "./plugins/withWorkManagerVersion",
+      "expo-font",
+      "expo-audio",
+      "expo-asset"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "ExpoWidgetsTarget",
+                  "bundleIdentifier": "com.flexical.app.ExpoWidgetsTarget",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.flexical.app"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "projectId": "ef3070ea-8c6b-44b3-9508-bd85d741745c"
+      }
     }
   }
 }

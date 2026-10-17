@@ -1,0 +1,18 @@
+diff --git a/node_modules/pdfjs-dist/legacy/build/pdf.mjs b/node_modules/pdfjs-dist/legacy/build/pdf.mjs
+index 2975d8d..1e66ace 100644
+--- a/node_modules/pdfjs-dist/legacy/build/pdf.mjs
++++ b/node_modules/pdfjs-dist/legacy/build/pdf.mjs
+@@ -17508,8 +17508,11 @@ class PDFWorker {
+       if (this.#mainThreadWorkerMessageHandler) {
+         return this.#mainThreadWorkerMessageHandler;
+       }
+-      const worker = await import(/*webpackIgnore: true*/this.workerSrc);
+-      return worker.WorkerMessageHandler;
++      const workerMessageHandler = globalThis.pdfjsWorker?.WorkerMessageHandler;
++      if (!workerMessageHandler) {
++        throw new Error("The PDF.js worker module has not been loaded.");
++      }
++      return workerMessageHandler;
+     };
+     return shadow(this, "_setupFakeWorkerGlobal", loader());
+   }
